@@ -1,0 +1,9 @@
+.dashboard {
+  min-height: 100vh;
+  background: var(--light);
+}
+
+.dashboard-content {
+  padding-top: 2rem;
+  padding-bottom: 4rem;
+}
