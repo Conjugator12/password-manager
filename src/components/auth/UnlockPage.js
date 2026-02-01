@@ -1,75 +1,123 @@
 import React, { useState } from "react";
-import { Lock } from "lucide-react";
+import {
+  Lock,
+  Eye,
+  EyeOff,
+  Shield,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import MasterPasswordInput from "./MasterPasswordInput";
-import Alert from "../common/Alert";
+import { useNavigate } from "react-router-dom";
+import "../../styles/register.css"; // Reuse the same styles
 
-const UnlockPage = ({ onSuccess }) => {
-  const { unlock } = useAuth();
-  const [masterPassword, setMasterPassword] = useState("");
+const UnlockPage = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleUnlock = async () => {
     setError("");
-    setIsLoading(true);
-
-    const result = await unlock(masterPassword);
-    setIsLoading(false);
-
+    const result = await login(password);
     if (result.success) {
-      onSuccess();
+      navigate("/dashboard");
     } else {
-      setError(result.error);
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      handleUnlock();
+      setError("Incorrect master password.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-            <Lock className="w-8 h-8 text-gray-600" />
+    <div className="register-container">
+      <div className="register-card">
+        <div className="register-header">
+          <div className="icon-circle">
+            <Lock className="icon" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Vault Locked</h1>
-          <p className="text-gray-600 mt-2">
-            Your vault was locked for security
-          </p>
+          <h1 className="title">Welcome Back</h1>
+          <p className="subtitle">Enter your master password</p>
         </div>
 
-        {error && <Alert type="error" message={error} />}
+        {error && (
+          <div className="alert alert-danger">
+            <AlertCircle size={20} />
+            <span>{error}</span>
+          </div>
+        )}
 
-        <div className="space-y-6 mt-6" onKeyPress={handleKeyPress}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Master Password
-            </label>
-            <MasterPasswordInput
-              value={masterPassword}
-              onChange={setMasterPassword}
-              placeholder="Enter your master password"
-            />
+        <div className="form">
+          <div className="form-group">
+            <label className="form-label">Master Password</label>
+            <div className="input-wrapper">
+              <Lock className="icon-left" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your master password"
+                className="form-input"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="icon-right"
+              >
+                {showPassword ? <EyeOff /> : <Eye />}
+              </button>
+            </div>
           </div>
 
-          <button
-            onClick={handleUnlock}
-            disabled={isLoading}
-            className="w-full bg-gray-800 text-white py-3 rounded-lg font-medium hover:bg-gray-900 disabled:bg-gray-400 transition-colors"
-          >
-            {isLoading ? "Unlocking..." : "Unlock Vault"}
+          <button className="submit-button" onClick={handleUnlock}>
+            Unlock Vault
           </button>
+
+          <p
+            className="subtitle"
+            style={{ marginTop: "1rem", textAlign: "center" }}
+          >
+            Don't have an account?{" "}
+            <span
+              style={{ color: "#2563eb", cursor: "pointer", fontWeight: "500" }}
+              onClick={() => navigate("/register")}
+            >
+              Create one
+            </span>
+          </p>
         </div>
 
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
-            Auto-locked after period of inactivity
-          </p>
+        {/* Security Features Section */}
+        <div
+          className="security-features"
+          style={{
+            background: "rgba(52, 152, 219, 0.05)",
+            borderRadius: "var(--radius-sm)",
+            padding: "1.5rem",
+            border: "1px solid rgba(52, 152, 219, 0.1)",
+            marginTop: "2rem",
+          }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <Shield className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              Secure Login
+            </h3>
+          </div>
+
+          <ul className="space-y-2">
+            <li className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>End-to-end encryption</span>
+            </li>
+            <li className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>Zero-knowledge architecture</span>
+            </li>
+            <li className="flex items-center gap-2 text-sm text-gray-600">
+              <CheckCircle className="w-4 h-4 text-green-500" />
+              <span>Your data never leaves your device</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

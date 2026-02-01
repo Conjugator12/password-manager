@@ -1,27 +1,35 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 import LoginPage from "../components/auth/LoginPage";
+import RegisterPage from "../components/auth/RegisterPage";
+import UnlockPage from "../components/auth/UnlockPage";
 import Dashboard from "../components/dashboard/Dashboard";
-
-const PrivateRoute = ({ children }) => {
-  const { isLoggedIn } = useAuth();
-  return isLoggedIn ? children : <Navigate to="/login" />;
-};
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRouter = () => {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
+      {/* Default route → login */}
+      <Route path="/" element={<LoginPage />} />
+
+      {/* Register page */}
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Unlock vault */}
+      <Route path="/unlock" element={<UnlockPage />} />
+
+      {/* Protected dashboard - ONLY ONE TIME */}
       <Route
-        path="/"
+        path="/dashboard"
         element={
-          <PrivateRoute>
+          <ProtectedRoute>
             <Dashboard />
-          </PrivateRoute>
+          </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/" />} />
+
+      {/* Catch-all → redirect to login */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };

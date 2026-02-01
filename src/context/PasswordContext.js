@@ -2,9 +2,15 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { cryptoUtils } from "../utils/crypto";
 import { useAuth } from "./AuthContext";
 
-const PasswordContext = createContext();
+const PasswordContext = createContext(null); // ✅ default value is null
 
-export const usePasswords = () => useContext(PasswordContext);
+export const usePasswords = () => {
+  const context = useContext(PasswordContext);
+  if (!context) {
+    throw new Error("usePasswords must be used within a PasswordProvider");
+  }
+  return context;
+};
 
 export const PasswordProvider = ({ children }) => {
   const [passwords, setPasswords] = useState([]);
@@ -90,10 +96,7 @@ export const PasswordProvider = ({ children }) => {
       entry.encryptedPassword,
       encryptionKey,
     );
-    return {
-      ...entry,
-      password: decrypted,
-    };
+    return { ...entry, password: decrypted };
   };
 
   useEffect(() => {

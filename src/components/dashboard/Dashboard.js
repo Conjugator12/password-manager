@@ -1,127 +1,92 @@
-import React, { useState } from "react";
+import React from "react";
+import { Shield, Zap, Search, Plus, Lock, LogOut } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
-import { usePasswords } from "../../context/PasswordContext";
-import PasswordList from "./PasswordList";
-import PasswordForm from "../password/PasswordForm";
-import Header from "../common/Header";
-import { Plus, Key } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import "../../styles/Dashboard.css";
 
 const Dashboard = () => {
-  const [view, setView] = useState("dashboard");
-  const [editingEntry, setEditingEntry] = useState(null);
+  const { logout, lock } = useAuth();
+  const navigate = useNavigate();
 
-  const { isLoggedIn, handleLogout } = useAuth();
-  const { passwords } = usePasswords();
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
-  if (!isLoggedIn) {
-    return null;
-  }
-
-  const styles = {
-    dashboard: {
-      minHeight: "100vh",
-      background: "#ecf0f1",
-    },
-    content: {
-      maxWidth: "1200px",
-      margin: "0 auto",
-      padding: "2rem 1rem 4rem",
-    },
-    addButton: {
-      width: "100%",
-      background: "#3498db",
-      color: "#ffffff",
-      padding: "1rem",
-      border: "none",
-      borderRadius: "8px",
-      fontSize: "1rem",
-      fontWeight: "600",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "0.5rem",
-      marginBottom: "2rem",
-    },
-    emptyState: {
-      background: "#ffffff",
-      borderRadius: "12px",
-      padding: "4rem 2rem",
-      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-      textAlign: "center",
-    },
-    emptyIcon: {
-      fontSize: "4rem",
-      color: "#ecf0f1",
-      marginBottom: "1.5rem",
-    },
-    emptyTitle: {
-      color: "#2c3e50",
-      fontSize: "1.5rem",
-      fontWeight: "600",
-      marginBottom: "0.5rem",
-    },
-    emptyDescription: {
-      color: "#95a5a6",
-    },
+  const handleLock = () => {
+    lock();
+    navigate("/");
   };
 
   return (
-    <div style={styles.dashboard}>
-      {/* Header */}
-      <Header
-        title="My Vault"
-        subtitle={`${passwords.length} passwords stored`}
-        onLogout={handleLogout}
-      />
-
-      <div style={styles.content}>
-        {view === "dashboard" ? (
-          <>
-            {/* Add Password Button */}
-            <button
-              onClick={() => {
-                setView("add");
-                setEditingEntry(null);
-              }}
-              style={styles.addButton}
-            >
-              <Plus size={20} />
-              <span>Add New Password</span>
-            </button>
-
-            {/* Password List or Empty State */}
-            {passwords.length === 0 ? (
-              <div style={styles.emptyState}>
-                <Key size={64} style={styles.emptyIcon} />
-                <h3 style={styles.emptyTitle}>No passwords yet</h3>
-                <p style={styles.emptyDescription}>
-                  Click "Add New Password" to get started
-                </p>
+    <div className="dashboard">
+      <div className="container dashboard-content">
+        {/* Header */}
+        <header className="dashboard-header">
+          <div className="dashboard-header-content">
+            <div className="dashboard-title-section">
+              <Shield className="dashboard-icon" />
+              <div>
+                <h1 className="dashboard-title">Password Manager</h1>
+                <p className="dashboard-subtitle">Secure password storage</p>
               </div>
-            ) : (
-              <PasswordList
-                onEdit={(entry) => {
-                  setEditingEntry(entry);
-                  setView("edit");
-                }}
+            </div>
+
+            <div className="dashboard-header-actions">
+              <button onClick={handleLock} className="btn btn-outline">
+                <Lock size={18} />
+                <span>Lock</span>
+              </button>
+              <button onClick={handleLogout} className="btn btn-primary">
+                <LogOut size={18} />
+                <span>Logout</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Search and Add Button */}
+          <div className="dashboard-search-section">
+            <div className="dashboard-search-container">
+              <Search className="dashboard-search-icon" size={20} />
+              <input
+                type="text"
+                placeholder="Search passwords..."
+                className="dashboard-search-input"
               />
-            )}
-          </>
-        ) : (
-          <PasswordForm
-            mode={view === "add" ? "add" : "edit"}
-            initialData={editingEntry}
-            onCancel={() => {
-              setView("dashboard");
-              setEditingEntry(null);
-            }}
-            onSuccess={() => {
-              setView("dashboard");
-              setEditingEntry(null);
-            }}
-          />
-        )}
+            </div>
+            <button className="dashboard-add-button">
+              <Plus size={20} />
+              <span>Add Password</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main>
+          {/* Empty State */}
+          <div className="dashboard-empty-state">
+            <Shield className="dashboard-empty-icon" />
+            <h2 className="dashboard-empty-title">No Passwords Yet</h2>
+            <p className="dashboard-empty-description">
+              Get started by adding your first password
+            </p>
+            <button className="dashboard-add-first-button">
+              <Plus size={20} />
+              <span>Add Your First Password</span>
+            </button>
+          </div>
+
+          {/* Stats Card */}
+          <div className="dashboard-stats-card">
+            <div className="dashboard-stats-content">
+              <div>
+                <p className="dashboard-stats-label">Total Passwords</p>
+                <p className="dashboard-stats-number">0</p>
+              </div>
+              <Zap className="dashboard-stats-icon" />
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );
